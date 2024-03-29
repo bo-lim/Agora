@@ -1,35 +1,35 @@
 const mongoose = require('mongoose')
 
 const GUESTBOOK_DB_ADDR = process.env.GUESTBOOK_DB_ADDR;
-const usersURI = "mongodb://" + GUESTBOOK_DB_ADDR + "/agora"
+const mongoURI = "mongodb://" + GUESTBOOK_DB_ADDR + "/agora"
 
 const db = mongoose.connection;
-
-db.on('disconnected', () => {
-    console.error(`Disconnected: unable to reconnect to ${usersURI}`)
-    throw new Error(`Disconnected: unable to reconnect to ${usersURI}`) 
-})
-db.on('error', (err) => {
-    console.error(`Unable to connect to ${usersURI}: ${err}`);
-});
-
-db.once('open', () => {
-  console.log(`connected to ${usersURI}`);
-});
-
-const connectToMongoDB = async () => {
-    await mongoose.connect(usersURI, {
-        useNewUrlParser: true,
-        connectTimeoutMS: 2000,
-        reconnectTries: 1
-    })
-};
 
 const usersSchema = mongoose.Schema({
     user_id: { type: String, required: [true, 'User_id is required'] },
     password: { type: String, required: [true, 'Password Body is required'] }
 });
 const usersModel = mongoose.model('Users', usersSchema);
+
+db.on('disconnected', () => {
+    console.error(`Disconnected: unable to reconnect to ${mongoURI}`)
+    throw new Error(`Disconnected: unable to reconnect to ${mongoURI}`) 
+})
+db.on('error', (err) => {
+    console.error(`Unable to connect to ${mongoURI}: ${err}`);
+});
+
+db.once('open', () => {
+  console.log(`connected to ${mongoURI}`);
+});
+
+const connectToMongoDB = async () => {
+    await mongoose.connect(mongoURI, {
+        useNewUrlParser: true,
+        connectTimeoutMS: 2000,
+        reconnectTries: 1
+    })
+};
 
 const construct = (params) => {
     const user_id = params.user_id
