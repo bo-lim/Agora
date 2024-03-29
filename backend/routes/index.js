@@ -6,10 +6,10 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 // Handles GET requests to /user
-router.post('/signin',(req,res) => {
+router.post('/signup',(req,res) => {
     console.log(`user collections`)
     try {
-        User.create(({name: req.body.name, password: req.body.password}))
+        User.create(({user_id: req.body.user_id, password: req.body.password}))
         res.status(200).send()
     } catch (err) {
         if (err.name == "ValidationError") {
