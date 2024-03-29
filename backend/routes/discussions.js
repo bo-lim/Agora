@@ -1,40 +1,21 @@
 const mongoose = require('mongoose')
 
 const GUESTBOOK_DB_ADDR = process.env.GUESTBOOK_DB_ADDR;
-const mongoURI = "mongodb://" + GUESTBOOK_DB_ADDR + "/agora"
 
 const db = mongoose.connection;
 
 const discussionsSchema = mongoose.Schema({
-    user_id: { type: String, required: [true, 'User_id is required'] },
-    password: { type: String, required: [true, 'Password Body is required'] }
+    user_id: { type: String, ref:"Users", required: [true, 'User_id is required'] },
+    question_id: { type: String, ref:"Questions", required: [true, 'Question_id Body is required'] },
+    discussion_content: { type: String, required: [true, 'Discussion_content is required'] }
 });
 const discussionsModel = mongoose.model('Discussions', discussionsSchema);
 
-db.on('disconnected', () => {
-    console.error(`Disconnected: unable to reconnect to ${mongoURI}`)
-    throw new Error(`Disconnected: unable to reconnect to ${mongoURI}`) 
-})
-db.on('error', (err) => {
-    console.error(`Unable to connect to ${mongoURI}: ${err}`);
-});
-
-db.once('open', () => {
-  console.log(`connected to ${mongoURI}`);
-});
-
-const connectToMongoDB = async () => {
-    await mongoose.connect(mongoURI, {
-        useNewUrlParser: true,
-        connectTimeoutMS: 2000,
-        reconnectTries: 1
-    })
-};
-
 const construct = (params) => {
     const user_id = params.user_id
-    const password = params.password
-    const message = new discussionsModel({ user_id: user_id, password: password })
+    const question_id = params.question_id
+    const discussion_content = params.discussion_content
+    const message = new discussionsModel({ user_id: user_id, question_id: question_id, discussion_content: discussion_content })
     return message
 };
 
@@ -58,7 +39,6 @@ const create = (params) => {
 
 module.exports = {
     create: create,
-    discussionsModel: discussionsModel,
-    connectToMongoDB: connectToMongoDB,
+    discussionsModel: discussionsModel
 }
 

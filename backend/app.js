@@ -4,6 +4,7 @@ const routes = require('./routes')
 const PORT = process.env.PORT
 
 const users = require('./routes/users')
+// const discussions = require('./routes/discussions')
 
 app.use('/', routes)
 
