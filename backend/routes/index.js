@@ -27,7 +27,7 @@ router.post('/signup',(req,res) => {
 
 // discussion
 router.post('/discussion',(req,res) => {
-    console.log(`discussion collections`)
+    console.log(`create opinion`)
     try {
         //Question 모델 생성되면 
         Discussion.create(({user_id: req.body.user_id, question_id: req.body.question_id, discussion_content:req.body.discussion_content}))
@@ -40,6 +40,26 @@ router.post('/discussion',(req,res) => {
             console.error('could not save: ' + err)
             res.status(500).json(err)
         }
+    }
+})
+
+router.get('/discussion',(req,res) => {
+    console.log(`discussion collections`)
+    try {
+        Discussion.discussionsModel.find({question_id: req.body.question_id}, (err,messages) => {
+            let list = []
+            console.log(messages)
+            if (messages.length > 0) {
+                messages.forEach((message) => {
+                    if (message.user_id && message.discussion_content){
+                        list.push({ 'user_id' : message.user_id, 'discussion_content' : message.discussion_content})
+                    }
+                });
+            }
+            res.status(200).json(list)
+        });
+    } catch (err) {
+        res.status(500).json(err)
     }
 })
 
