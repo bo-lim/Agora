@@ -67,10 +67,12 @@ router.get('/discussion',(req,res) => {
 router.post('/answer',(req,res) => {
     console.log(`create answer`)
     try {
-        const alreadySolved = UserAnswer.userAnswersModel.find({user_id: req.body.user_id, question_id: req.body.question_id})
-        if (alreadySolved.length > 0) return res.status(409).json({message:'이미 푼 문제입니다.'})
-        UserAnswer.create(({user_id: req.body.user_id, question_id: req.body.question_id, selected_answer:req.body.selected_answer.toUpperCase()}))
-        res.status(200).send()
+        UserAnswer.userAnswersModel.find({user_id: req.body.user_id, question_id: req.body.question_id}, (err, messages) => {
+            if (messages.length > 0) return res.status(409).json({message:'이미 푼 문제입니다.'})
+            else {UserAnswer.create(({user_id: req.body.user_id, question_id: req.body.question_id, selected_answer:req.body.selected_answer.toUpperCase()}))
+                res.status(200).send()}
+        });
+        
     } catch (err) {
         if (err.name == "ValidationError") {
             console.error('validation error: ' + err)
