@@ -44,7 +44,7 @@ router.post('/discussion',(req,res) => {
 })
 
 router.get('/discussion',(req,res) => {
-    console.log(`discussion collections`)
+    console.log(`get discussion`)
     try {
         Discussion.discussionsModel.find({question_id: req.body.question_id}, (err,messages) => {
             let list = []
@@ -67,10 +67,9 @@ router.get('/discussion',(req,res) => {
 router.post('/answer',(req,res) => {
     console.log(`create answer`)
     try {
-        //Question 모델 생성되면
         const alreadySolved = UserAnswer.userAnswersModel.find({user_id: req.body.user_id, question_id: req.body.question_id})
-        if (alreadySolved) return res.status(409).json({message:'이미 푼 문제입니다.'})
-        UserAnswer.create(({user_id: req.body.user_id, question_id: req.body.question_id, selected_answer:req.body.selected_answer}))
+        if (alreadySolved.length > 0) return res.status(409).json({message:'이미 푼 문제입니다.'})
+        UserAnswer.create(({user_id: req.body.user_id, question_id: req.body.question_id, selected_answer:req.body.selected_answer.toUpperCase()}))
         res.status(200).send()
     } catch (err) {
         if (err.name == "ValidationError") {
@@ -80,6 +79,75 @@ router.post('/answer',(req,res) => {
             console.error('could not save: ' + err)
             res.status(500).json(err)
         }
+    }
+})
+
+router.get('/answer',(req,res) => {
+    console.log(`get answer`)
+    try {
+        UserAnswer.userAnswersModel.find({user_id: req.body.user_id, question_id: req.body.question_id}, (err,messages) => {
+            console.log(messages)
+            if (messages.length > 0) {
+                messages.forEach((message) => {
+                    if (message.selected_answer){
+                        return res.status(200).json({selected_answer: message.selected_answer})
+                    }
+                });
+            }
+        });
+    } catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+router.get('/answers',(req,res) => {
+    console.log(`get answer`)
+    try {
+        UserAnswer.userAnswersModel.find({user_id: req.body.user_id, }, (err,messages) => {
+            let list = []
+            console.log(messages)
+            if (messages.length > 0) {
+                messages.forEach((message) => {
+                    if (message.selected_answer){
+                        list.push({question_id: message.question_id, selected_answer: message.selected_answer})
+                    }
+                });
+            }
+            res.status(200).json(list)
+        });
+    } catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+router.get('/ratio',(req,res) => {
+    console.log(`get ratio`)
+    try {
+        UserAnswer.userAnswersModel.find({question_id: req.body.question_id}, (err,messages) => {
+            let ratio = {}
+            let total = 0
+            let result = {}
+            console.log(messages)
+            if (messages.length > 0) {
+                messages.forEach((message) => {
+                    let s_answers = message.selected_answer.split("")
+                    console.log(s_answers)
+                    s_answers.forEach(s_answer => {
+                        console.log(s_answer)
+                        total++
+                        if (s_answer in ratio) ratio[s_answer] += 1
+                        else ratio[s_answer] = 1
+                    })
+                });
+            }
+            console.log(ratio)
+            for(r in ratio){
+                result[r] = ((ratio[r]/total)*100).toFixed(2)
+            }
+            res.status(200).json(result)
+        });
+    } catch (err) {
+        res.status(500).json(err)
     }
 })
 
