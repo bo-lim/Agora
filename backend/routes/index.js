@@ -272,11 +272,28 @@ router.get("/question", async (req, res) => {
     }
 
     const list = {
-      data: questions.map((q) => q.toObject({ getters: true })),
+      data: questions.map((q) => q.toObject({ getters: false })),
     };
 
     res.status(200).json(list);
   } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get("/question-detail", async(req, res) => {
+  const { _id } = req.query;
+  console.log(`get each question by _id`);
+  try{
+    const qid = await Question.qstModel.findOne({ _id : _id })
+
+    if (!qid || qid.length === 0) {
+      return res.status(404).json({ message: "No question" });
+    }
+
+    const question = qid.toObject({ getters: false });
+    res.status(200).json(question); 
+  } catch(err) {
     res.status(500).json(err);
   }
 });
