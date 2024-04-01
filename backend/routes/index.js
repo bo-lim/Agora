@@ -12,17 +12,8 @@ router.use(bodyParser.json());
 router.post("/signup", (req, res) => {
   console.log(`user collections`);
   try {
-    const tmp = User.usersModel.findById( req.body.user_id, (err, users) => {
-      console.log(users)
-      if (users){
-        return res.status(409).json({message: "이미 가입된 유저입니다."});
-      }
-      else{
-        User.create({ user_id: req.body.user_id, password: req.body.password });
-        res.status(201).send();
-      }
-    });
-    
+    User.create({ user_id: req.body.user_id, password: req.body.password });
+    res.status(201).send();
   } catch (err) {
     if (err.name == "ValidationError") {
       console.error("validation error: " + err);
@@ -40,16 +31,22 @@ router.post("/login", (req, res) => {
 
   // 요청된 user_id를 데이터베이스에서 찾는다.
   try {
-    User.usersModel.findById(req.body.user_id, (err, users) => {
-      console.log(users);
-      if (users.password == req.body.password) {
-        return res.status(200).json({ success: true });
-      }
-      return res.status(400).json({ success: false });
-    });
+      User.usersModel.findById( req.body.user_id, (err, users) => {
+        if (!users) {
+          return res.status(400).json({success: false, message: "존재하지 않는 아이디입니다."});
+        }
+        
+
+        console.log(users)
+          if (users.password == req.body.password){
+              return res.status(200).json({success: true});
+          }
+          return res.status(401).json({success: false, message: "비밀번호가 틀렸습니다."});
+      }); //user.password 에 findmyid 를 찾고 비교
   } catch (err) {
-    return res.status(500).json(err);
+      return res.status(500).json(err);
   }
+
 });
 
 // discussion
@@ -296,7 +293,7 @@ router.get("/question-detail", async(req, res) => {
 
     const question = qid.toObject({ getters: false });
     res.status(200).json(question); 
-  } catch {
+  } catch(err) {
     res.status(500).json(err);
   }
 });
