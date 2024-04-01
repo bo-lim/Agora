@@ -12,8 +12,17 @@ router.use(bodyParser.json());
 router.post("/signup", (req, res) => {
   console.log(`user collections`);
   try {
-    User.create({ user_id: req.body.user_id, password: req.body.password });
-    res.status(201).send();
+    const tmp = User.usersModel.findById( req.body.user_id, (err, users) => {
+      console.log(users)
+      if (users){
+        return res.status(409).json({message: "이미 가입된 유저입니다."});
+      }
+      else{
+        User.create({ user_id: req.body.user_id, password: req.body.password });
+        res.status(201).send();
+      }
+    });
+    
   } catch (err) {
     if (err.name == "ValidationError") {
       console.error("validation error: " + err);
