@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors")
 const bodyParser = require("body-parser");
 const User = require("./users");
 const Discussion = require("./discussions");
@@ -6,14 +7,24 @@ const UserAnswer = require("./userAnswers");
 const Question = require("./questions");
 
 const router = express.Router();
+router.use(cors());
 router.use(bodyParser.json());
 
 // user
 router.post("/signup", (req, res) => {
   console.log(`user collections`);
   try {
-    User.create({ user_id: req.body.user_id, password: req.body.password });
-    res.status(201).send();
+    const tmp = User.usersModel.findById( req.body.user_id, (err, users) => {
+      console.log(users)
+      if (users){
+        return res.status(409).json({message: "이미 가입된 유저입니다."});
+      }
+      else{
+        User.create({ user_id: req.body.user_id, password: req.body.password });
+        res.status(201).json({user_id:req.body.user_id, message: "회원 가입 성공"});
+      }
+    });
+    
   } catch (err) {
     if (err.name == "ValidationError") {
       console.error("validation error: " + err);
