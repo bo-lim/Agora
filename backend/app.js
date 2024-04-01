@@ -1,7 +1,10 @@
 const express = require('express')
 const app = express()
+const cors = require('cors');
 const routes = require('./routes')
 const PORT = process.env.PORT
+
+app.use(cors()); // 모든 출처에서의 요청을 허용합니다.
 
 const users = require('./routes/users')
 // const discussions = require('./routes/discussions')

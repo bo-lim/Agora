@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
 const User = require("./users");
 const Discussion = require("./discussions");
@@ -8,7 +7,6 @@ const Question = require("./questions");
 const Category = require("./category");
 
 const router = express.Router();
-router.use(cors());
 router.use(bodyParser.json());
 
 // user
