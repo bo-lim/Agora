@@ -19,7 +19,7 @@ router.post("/signup", (req, res) => {
       }
       else{
         User.create({ user_id: req.body.user_id, password: req.body.password });
-        res.status(201).send();
+        res.status(201).json({user_id:req.body.user_id, message: "회원 가입 성공"});
       }
     });
     
