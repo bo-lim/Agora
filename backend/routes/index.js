@@ -296,7 +296,7 @@ router.get("/question-detail", async(req, res) => {
 
     const question = qid.toObject({ getters: false });
     res.status(200).json(question); 
-  } catch {
+  } catch(err) {
     res.status(500).json(err);
   }
 });
