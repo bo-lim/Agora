@@ -31,17 +31,16 @@ router.post("/login", (req, res) => {
 
   // 요청된 user_id를 데이터베이스에서 찾는다.
   try {
-      User.usersModel.findById( req.body.user_id, (err, users) => {
-          console.log(users)
-          if (users.password == req.body.password){
-              return res.status(200).json({success: true});
-          }
-          return res.status(400).json({success: false});
-      });
+    User.usersModel.findById(req.body.user_id, (err, users) => {
+      console.log(users);
+      if (users.password == req.body.password) {
+        return res.status(200).json({ success: true });
+      }
+      return res.status(400).json({ success: false });
+    });
   } catch (err) {
-      return res.status(500).json(err);
+    return res.status(500).json(err);
   }
-
 });
 
 // discussion
@@ -267,11 +266,28 @@ router.get("/question", async (req, res) => {
     }
 
     const list = {
-      data: questions.map((q) => q.toObject({ getters: true })),
+      data: questions.map((q) => q.toObject({ getters: false })),
     };
 
     res.status(200).json(list);
   } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get("/question-detail", async(req, res) => {
+  const { _id } = req.query;
+  console.log(`get each question by _id`);
+  try{
+    const qid = await Question.qstModel.findOne({ _id : _id })
+
+    if (!qid || qid.length === 0) {
+      return res.status(404).json({ message: "No question" });
+    }
+
+    const question = qid.toObject({ getters: false });
+    res.status(200).json(question); 
+  } catch {
     res.status(500).json(err);
   }
 });
