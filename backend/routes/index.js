@@ -40,16 +40,22 @@ router.post("/login", (req, res) => {
 
   // 요청된 user_id를 데이터베이스에서 찾는다.
   try {
-    User.usersModel.findById(req.body.user_id, (err, users) => {
-      console.log(users);
-      if (users.password == req.body.password) {
-        return res.status(200).json({ success: true });
-      }
-      return res.status(400).json({ success: false });
-    });
+      User.usersModel.findById( req.body.user_id, (err, users) => {
+        if (!users) {
+          return res.status(400).json({success: false, message: "존재하지 않는 아이디입니다."});
+        }
+        
+
+        console.log(users)
+          if (users.password == req.body.password){
+              return res.status(200).json({success: true});
+          }
+          return res.status(401).json({success: false, message: "비밀번호가 틀렸습니다."});
+      }); //user.password 에 findmyid 를 찾고 비교
   } catch (err) {
-    return res.status(500).json(err);
+      return res.status(500).json(err);
   }
+
 });
 
 // discussion
@@ -218,13 +224,13 @@ router.post("/question", async (req, res) => {
   try {
     let temp = req.body;
 
-    // 질문 텍스트 중복 체크
-    const dupCheck = await Question.qstModel.findOne({
-      question_text: temp.question_text,
-    });
-    if (dupCheck) {
-      return res.status(409).json({ message: "Duplicate question text" });
-    }
+    // // 질문 텍스트 중복 체크
+    // const dupCheck = await Question.qstModel.findOne({
+    //   question_text: temp.question_text,
+    // });
+    // if (dupCheck) {
+    //   return res.status(409).json({ message: "Duplicate question text" });
+    // }
 
     // qst_counter에서 name 조회 후 count 판단
     const type = req.body.qualification_type;
