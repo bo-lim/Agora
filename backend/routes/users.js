@@ -6,7 +6,7 @@ const mongoURI = "mongodb://" + GUESTBOOK_DB_ADDR + "/agora"
 const db = mongoose.connection;
 
 const usersSchema = mongoose.Schema({
-    user_id: { type: String, required: [true, 'User_id is required'] },
+    _id: { type: String, required: [true, 'User_id is required'] },
     password: { type: String, required: [true, 'Password Body is required'] }
 });
 const usersModel = mongoose.model('Users', usersSchema);
@@ -34,7 +34,7 @@ const connectToMongoDB = async () => {
 const construct = (params) => {
     const user_id = params.user_id
     const password = params.password
-    const message = new usersModel({ user_id: user_id, password: password })
+    const message = new usersModel({ _id: user_id, password: password })
     return message
 };
 

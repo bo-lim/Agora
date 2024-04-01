@@ -25,6 +25,25 @@ router.post("/signup", (req, res) => {
   }
 });
 
+//login sector
+router.post("/login", (req, res) => {
+  const { user_id, password } = req.body;
+
+  // 요청된 user_id를 데이터베이스에서 찾는다.
+  try {
+      User.usersModel.findById( req.body.user_id, (err, users) => {
+          console.log(users)
+          if (users.password == req.body.password){
+              return res.status(200).json({success: true});
+          }
+          return res.status(400).json({success: false});
+      });
+  } catch (err) {
+      return res.status(500).json(err);
+  }
+
+});
+
 // discussion
 router.post("/discussion", (req, res) => {
   console.log(`create opinion`);
