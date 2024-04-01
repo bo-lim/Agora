@@ -1,10 +1,11 @@
 const express = require("express");
-const cors = require("cors")
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const User = require("./users");
 const Discussion = require("./discussions");
 const UserAnswer = require("./userAnswers");
 const Question = require("./questions");
+const Category = require("./category");
 
 const router = express.Router();
 router.use(cors());
@@ -14,17 +15,17 @@ router.use(bodyParser.json());
 router.post("/signup", (req, res) => {
   console.log(`user collections`);
   try {
-    const tmp = User.usersModel.findById( req.body.user_id, (err, users) => {
-      console.log(users)
-      if (users){
-        return res.status(409).json({message: "이미 가입된 유저입니다."});
-      }
-      else{
+    const tmp = User.usersModel.findById(req.body.user_id, (err, users) => {
+      console.log(users);
+      if (users) {
+        return res.status(409).json({ message: "이미 가입된 유저입니다." });
+      } else {
         User.create({ user_id: req.body.user_id, password: req.body.password });
-        res.status(201).json({user_id:req.body.user_id, message: "회원 가입 성공"});
+        res
+          .status(201)
+          .json({ user_id: req.body.user_id, message: "회원 가입 성공" });
       }
     });
-    
   } catch (err) {
     if (err.name == "ValidationError") {
       console.error("validation error: " + err);
@@ -42,22 +43,24 @@ router.post("/login", (req, res) => {
 
   // 요청된 user_id를 데이터베이스에서 찾는다.
   try {
-      User.usersModel.findById( req.body.user_id, (err, users) => {
-        if (!users) {
-          return res.status(400).json({success: false, message: "존재하지 않는 아이디입니다."});
-        }
-        
+    User.usersModel.findById(req.body.user_id, (err, users) => {
+      if (!users) {
+        return res
+          .status(400)
+          .json({ success: false, message: "존재하지 않는 아이디입니다." });
+      }
 
-        console.log(users)
-          if (users.password == req.body.password){
-              return res.status(200).json({success: true});
-          }
-          return res.status(401).json({success: false, message: "비밀번호가 틀렸습니다."});
-      }); //user.password 에 findmyid 를 찾고 비교
+      console.log(users);
+      if (users.password == req.body.password) {
+        return res.status(200).json({ success: true });
+      }
+      return res
+        .status(401)
+        .json({ success: false, message: "비밀번호가 틀렸습니다." });
+    }); //user.password 에 findmyid 를 찾고 비교
   } catch (err) {
-      return res.status(500).json(err);
+    return res.status(500).json(err);
   }
-
 });
 
 // discussion
@@ -292,19 +295,50 @@ router.get("/question", async (req, res) => {
   }
 });
 
-router.get("/question-detail", async(req, res) => {
+router.get("/question-detail", async (req, res) => {
   const { _id } = req.query;
   console.log(`get each question by _id`);
-  try{
-    const qid = await Question.qstModel.findOne({ _id : _id })
+  try {
+    const qid = await Question.qstModel.findOne({ _id: _id });
 
     if (!qid || qid.length === 0) {
       return res.status(404).json({ message: "No question" });
     }
 
     const question = qid.toObject({ getters: false });
-    res.status(200).json(question); 
-  } catch(err) {
+    res.status(200).json(question);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// category
+router.post("/category", async (req, res) => {
+  console.log(`add category`);
+  try {
+    const dupCheck = await Category.cateModel.findOne({
+      qualification_type: req.body.qualification_type,
+    });
+    if (dupCheck) {
+      return res.status(409).json({ message: "Duplicate category" });
+    }
+
+    Category.cateModel.create({
+      qualification_type: req.body.qualification_type,
+    });
+    res.status(200).json({ message: "Category add success" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get("/category", async (req, res) => {
+  console.log(`get category`);
+  try {
+    const tempCate = await Category.cateModel.find({}).exec();
+    const categories = tempCate.map((category) => category.qualification_type);
+    res.status(200).json(categories);
+  } catch (err) {
     res.status(500).json(err);
   }
 });
