@@ -30,6 +30,8 @@ const qstSchema = mongoose.Schema({
   question_text: String,
   options: [String],
   correct_answer: [String],
+}, {
+  versionKey: false
 });
 
 const qstModel = mongoose.model("Questions", qstSchema);

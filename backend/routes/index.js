@@ -218,13 +218,13 @@ router.post("/question", async (req, res) => {
   try {
     let temp = req.body;
 
-    // 질문 텍스트 중복 체크
-    const dupCheck = await Question.qstModel.findOne({
-      question_text: temp.question_text,
-    });
-    if (dupCheck) {
-      return res.status(409).json({ message: "Duplicate question text" });
-    }
+    // // 질문 텍스트 중복 체크
+    // const dupCheck = await Question.qstModel.findOne({
+    //   question_text: temp.question_text,
+    // });
+    // if (dupCheck) {
+    //   return res.status(409).json({ message: "Duplicate question text" });
+    // }
 
     // qst_counter에서 name 조회 후 count 판단
     const type = req.body.qualification_type;
