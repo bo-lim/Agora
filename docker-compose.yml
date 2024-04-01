@@ -1,0 +1,78 @@
+version: '3.8'
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "88:80"
+    depends_on:
+      - frontend
+    networks:
+      - frontend-network
+    restart: always
+  frontend:
+    image:
+      dbgurum/guestbook:frontend_1.0
+    ports:
+      - "10001-10003:8000"
+    networks:
+      - frontend-network
+    restart: always
+    environment:
+      PORT: 8000
+      GUESTBOOK_API_ADDR: haproxy:8000
+    deploy:
+      replicas: 3
+      mode: replicated
+  haproxy:
+    image:
+      leebolim0701471/haproxy:5.0
+    build:
+      context: ./haproxy
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+      - "9001:9000"
+    depends_on:
+      - backend
+    networks:
+      - frontend-network
+      - backend-network
+    restart: always
+  backend:
+    ports:
+        - "8001-8003:8000"
+    environment:
+      PORT: 8000
+      GUESTBOOK_DB_ADDR: mongodb:27017
+    networks:
+      - backend-network
+    image:
+      leebolim0701471/agora-backend:2.0
+    deploy:
+      replicas: 3
+      mode: replicated
+    depends_on:
+      - mongodb
+    restart: always
+  mongodb:
+    ports:
+      - "17017:27017"
+    image:
+      mongo:4
+    networks:
+      - backend-network
+    restart: always
+
+networks:
+  frontend-network: 
+    ipam:
+        driver: default
+        config:
+          - subnet: 172.28.0.0/16
+  backend-network:
+    ipam:
+        driver: default
+        config:
+          - subnet: 172.29.0.0/16
