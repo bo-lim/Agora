@@ -36,8 +36,6 @@ router.post("/signup", (req, res) => {
 });
 
 //login sector
-const jwt = require('jsonwebtoken');
-
 router.post("/login", (req, res) => {
   const { user_id, password } = req.body;
   // 요청된 user_id를 데이터베이스에서 찾는다.
@@ -52,17 +50,10 @@ router.post("/login", (req, res) => {
       }
       // 비밀번호 확인 
       if (user.password === password) {
-        // 토큰 생성
-        const token = jwt.sign(
-          { user_id: user.id },
-          'secretKey', // 이 비밀 키는 실제 환경에서는 보안이 유지되는 곳에 저장되어야 합니다.
-          { expiresIn: '1h' } // 토큰의 유효 시간은 1시간으로 설정
-        );
         
         res.setHeader('Content-Type', 'application/json');
         return res.status(201).json({ // 상태 코드를 201로 변경
           success: true,
-          token: token, // 생성된 토큰을 반환
           user_id: user.id // 사용자의 ID를 반환
         });
       } else {
