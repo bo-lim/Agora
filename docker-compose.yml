@@ -21,19 +21,22 @@ services:
     restart: always
     environment:
       PORT: 8000
-      GUESTBOOK_API_ADDR: haproxy:8000
+      GUESTBOOK_API_ADDR: 172.28.0.100
     deploy:
       replicas: 3
       mode: replicated
   haproxy:
     image:
-      leebolim0701471/haproxy:5.0
+      leebolim0701471/haproxy:6.0
     build:
       context: ./haproxy
       dockerfile: Dockerfile
     ports:
-      - "8000:80"
-      - "9001:9000"
+      - "7999-8000:80"
+      - "9000-9001:9000"
+    deploy:
+      replicas: 2
+      mode: replicated
     depends_on:
       - backend
     networks:
