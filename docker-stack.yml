@@ -1,16 +1,14 @@
 version: '3.8'
 services:
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+    image:
+      leebolim0701471/frontend-lb:1.0
     ports:
       - "88:80"
     depends_on:
       - frontend
     networks:
       - frontend-network
-    restart: always
   frontend:
     image:
       dbgurum/guestbook:frontend_1.0
@@ -18,7 +16,6 @@ services:
       - "10001-10003:8000"
     networks:
       - frontend-network
-    restart: always
     environment:
       PORT: 8000
       GUESTBOOK_API_ADDR: haproxy:8000
@@ -28,22 +25,24 @@ services:
   haproxy:
     image:
       leebolim0701471/haproxy:6.0
-    privileged: true
     ports:
-      - "8000:80"
-      - "9001:9000"
+      - "7999-8000:80"
+      - "9000-9001:9000"
+    deploy:
+      replicas: 2
+      mode: replicated
+    privileged: true
     depends_on:
       - backend
     networks:
       - frontend-network
       - backend-network
-    restart: always
   backend:
     ports:
-        - "8001-8003:8000"
+      - "8001-8003:8000"
     environment:
       PORT: 8000
-      GUESTBOOK_DB_ADDR: mongodb:27017
+      GUESTBOOK_DB_ADDR: mongo:27017
     networks:
       - backend-network
     image:
@@ -52,16 +51,14 @@ services:
       replicas: 3
       mode: replicated
     depends_on:
-      - mongodb
-    restart: always
-  mongodb:
+      - mongo
+  mongo:
     ports:
       - "17017:27017"
     image:
       mongo:4
     networks:
       - backend-network
-    restart: always
 
 networks:
   frontend-network: 
