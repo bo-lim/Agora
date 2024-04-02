@@ -46,8 +46,12 @@ services:
       GUESTBOOK_DB_ADDR: mongodb:27017
     networks:
       - backend-network
-    image:
-      leebolim0701471/agora-backend:3.0
+    # image:
+    #   leebolim0701471/agora-backend:3.0
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # image 최종본 만들어지면 그 때 주석 풀고 build 없애기~
     deploy:
       replicas: 3
       mode: replicated
