@@ -28,9 +28,7 @@ services:
   haproxy:
     image:
       leebolim0701471/haproxy:6.0
-    build:
-      context: ./haproxy
-      dockerfile: Dockerfile
+    privileged: true
     ports:
       - "7999-8000:80"
       - "9000-9001:9000"

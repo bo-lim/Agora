@@ -31,6 +31,7 @@ services:
     deploy:
       replicas: 2
       mode: replicated
+    privileged: true
     depends_on:
       - backend
     networks:
