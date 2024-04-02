@@ -36,30 +36,47 @@ router.post("/signup", (req, res) => {
 });
 
 //login sector
+const jwt = require('jsonwebtoken');
+
 router.post("/login", (req, res) => {
   const { user_id, password } = req.body;
-
   // 요청된 user_id를 데이터베이스에서 찾는다.
   try {
-    User.usersModel.findById(req.body.user_id, (err, users) => {
-      if (!users) {
-        return res
-          .status(400)
-          .json({ success: false, message: "존재하지 않는 아이디입니다." });
+    User.usersModel.findById(user_id, (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: "서버 에러 발생" });
       }
 
-      console.log(users);
-      if (users.password == req.body.password) {
-        return res.status(200).json({ success: true });
+      if (!user) {
+        return res.status(400).json({ success: false, message: "존재하지 않는 아이디입니다." });
       }
-      return res
-        .status(401)
-        .json({ success: false, message: "비밀번호가 틀렸습니다." });
-    }); //user.password 에 findmyid 를 찾고 비교
+      // 비밀번호 확인 
+      if (user.password === password) {
+        // 토큰 생성
+        const token = jwt.sign(
+          { user_id: user.id },
+          'secretKey', // 이 비밀 키는 실제 환경에서는 보안이 유지되는 곳에 저장되어야 합니다.
+          { expiresIn: '1h' } // 토큰의 유효 시간은 1시간으로 설정
+        );
+        
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(201).json({ // 상태 코드를 201로 변경
+          success: true,
+          token: token, // 생성된 토큰을 반환
+          user_id: user.id // 사용자의 ID를 반환
+        });
+      } else {
+        return res.status(401).json({ success: false, message: "비밀번호가 틀렸습니다." });
+      }
+    });
   } catch (err) {
-    return res.status(500).json(err);
+    return res.status(500).json({ success: false, message: "서버 처리 중 오류 발생" });
   }
 });
+
+
+
+
 
 // discussion
 router.post("/discussion", (req, res) => {
@@ -321,7 +338,7 @@ router.post("/category", async (req, res) => {
       return res.status(409).json({ message: "Duplicate category" });
     }
 
-    Category.cateModel.create({
+    await Category.cateModel.create({
       qualification_type: req.body.qualification_type,
     });
     res.status(200).json({ message: "Category add success" });
