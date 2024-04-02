@@ -47,7 +47,7 @@ services:
     networks:
       - backend-network
     image:
-      leebolim0701471/agora-backend:2.0
+      leebolim0701471/agora-backend:3.0
     deploy:
       replicas: 3
       mode: replicated
