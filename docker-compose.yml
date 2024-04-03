@@ -87,8 +87,12 @@ services:
       replicas: 3
       mode: replicated
   haproxy:
-    image:
-      leebolim0701471/haproxy:6.0
+    build: 
+      context: ./haproxy
+      dockerfile: Dockerfile
+
+    # image:
+    #   leebolim0701471/haproxy:6.0
     privileged: true
     ports:
       - "8000:80"
@@ -100,8 +104,8 @@ services:
       - backend-network
     restart: always
   backend:
-    ports:
-        - "8001-8003:8000"
+    # ports:
+    #     - "8001-8003:8000"
     environment:
       PORT: 8000
       GUESTBOOK_DB_ADDR: mongodb:27017
