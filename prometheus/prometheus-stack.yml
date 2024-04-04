@@ -25,7 +25,7 @@ scrape_configs:
   - job_name: 'prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: ['192.168.56.101:9099']
+      - targets: ['prometheus:9090']
 
   - job_name: 'node-exporter'
     scrape_interval: 5s
@@ -39,7 +39,7 @@ scrape_configs:
   - job_name: 'cadvisor'
     scrape_interval: 5s
     static_configs:
-            - targets: ['192.168.56.101:9559']
+            - targets: ['cadvisor:8080']
             
 # global.scrape_interval: 기본적인 수집 간격.
 # global.external_labels.monitor: 모니터에 대한 별칭 설정.

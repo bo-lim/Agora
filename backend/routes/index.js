@@ -8,6 +8,7 @@ const Category = require("./category");
 
 const router = express.Router();
 router.use(bodyParser.json());
+router.use(express.json());
 
 // user
 router.post("/signup", (req, res) => {
