@@ -95,7 +95,7 @@ router.get("/discussion", (req, res) => {
   console.log(`get discussion`);
   try {
     Discussion.discussionsModel.find(
-      { question_id: req.body.question_id },
+      { question_id: req.query.question_id },
       (err, messages) => {
         let list = [];
         console.log(messages);
