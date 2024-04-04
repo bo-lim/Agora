@@ -152,7 +152,7 @@ router.get("/answer", (req, res) => {
   console.log(`get answer`);
   try {
     UserAnswer.userAnswersModel.find(
-      { user_id: req.body.user_id, question_id: req.body.question_id },
+      { user_id: req.query.user_id, question_id: req.body.question_id },
       (err, messages) => {
         console.log(messages);
         if (messages.length > 0) {
@@ -201,7 +201,7 @@ router.get("/ratio", (req, res) => {
   console.log(`get ratio`);
   try {
     UserAnswer.userAnswersModel.find(
-      { question_id: req.body.question_id },
+      { question_id: req.query.question_id },
       (err, messages) => {
         let ratio = {};
         let total = 0;
