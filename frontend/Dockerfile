@@ -1,22 +1,28 @@
 FROM node:lts-alpine
 
-# install simple http server for serving static content
+# 환경 변수를 빌드 인자로 선언
+ARG VUE_APP_BACKEND_API
+
+# 빌드 인자를 환경 변수로 설정
+ENV VUE_APP_BACKEND_API=$VUE_APP_BACKEND_API
+
+# simple http server for serving static content을 설치
 RUN npm install -g http-server
 
-# make the 'app' folder the current working directory
+# 'app' 폴더를 현재 작업 디렉토리로 설정
 WORKDIR /app
 
-# copy both 'package.json' and 'package-lock.json' (if available)
+# 'package.json'과 'package-lock.json' (있는 경우)을 복사
 COPY package*.json ./
 
-# install project dependencies leaving out dev dependencies
+# 프로젝트 의존성 설치, 개발 의존성 제외
 RUN npm install --production
 
-# copy project files and folders to the current working directory (i.e. 'app' folder)
+# 프로젝트 파일과 폴더를 현재 작업 디렉토리로 복사
 COPY . .
 
-# build app for production with minification
+# 프로덕션을 위한 앱 빌드
 RUN npm run build
 
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+CMD ["http-server", "dist"]
