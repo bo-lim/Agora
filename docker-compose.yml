@@ -85,14 +85,15 @@ services:
       - frontend-network
     restart: always
     environment:
-      - VUE_APP_BACKEND_API=http://localhost
+      - VUE_APP_BACKEND_API=http://vip
     deploy:
       replicas: 3
       mode: replicated
     depends_on:
-      - haproxy
+      - haproxy1
+      - haproxy2
 
-  haproxy:
+  haproxy1:
     build: 
       context: ./haproxy
       dockerfile: Dockerfile
@@ -108,6 +109,27 @@ services:
       - frontend-network
       - backend-network
     restart: always
+    cap_add:
+      - NET_ADMIN
+
+  haproxy2:
+    build: 
+      context: ./haproxy2
+      dockerfile: Dockerfile
+    # image:
+    #   leebolim0701471/haproxy:6.0
+    privileged: true
+    ports:
+      - "8001:80"
+      - "9002:9000"
+    depends_on:
+      - backend
+    networks:
+      - frontend-network
+      - backend-network
+    restart: always
+    cap_add:
+      - NET_ADMIN
 
   backend:
     # ports:
