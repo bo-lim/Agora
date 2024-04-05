@@ -79,13 +79,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VUE_APP_BACKEND_API: http://192.168.0.14:8000
     ports:
       - "10001-10003:8080"
+    # environment:
+    #   VUE_APP_BACKEND_API: http://192.168.0.14:8000
     networks:
       - frontend-network
     restart: always
-    environment:
-      - VUE_APP_BACKEND_API=http://localhost
     deploy:
       replicas: 3
       mode: replicated
