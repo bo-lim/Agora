@@ -72,25 +72,30 @@ services:
     networks:
       - frontend-network
     restart: always
+
   frontend:
-    image:
-      dbgurum/guestbook:frontend_1.0
+    # image:
+    #   dbgurum/guestbook:frontend_1.0
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "10001-10003:8000"
+      - "10001-10003:8080"
     networks:
       - frontend-network
     restart: always
     environment:
-      PORT: 8000
-      GUESTBOOK_API_ADDR: haproxy:8000
+      - VUE_APP_BACKEND_API=http://localhost
     deploy:
       replicas: 3
       mode: replicated
+    depends_on:
+      - haproxy
+
   haproxy:
     build: 
       context: ./haproxy
       dockerfile: Dockerfile
-
     # image:
     #   leebolim0701471/haproxy:6.0
     privileged: true
@@ -103,6 +108,7 @@ services:
       - frontend-network
       - backend-network
     restart: always
+
   backend:
     # ports:
     #     - "8001-8003:8000"
