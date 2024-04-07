@@ -96,6 +96,9 @@ services:
     deploy:
       replicas: 3
       mode: replicated
+      restart_policy:
+        condition: on-failure
+
   haproxy:
     image:
       leebolim0701471/haproxy:6.0
@@ -106,11 +109,14 @@ services:
     deploy:
       replicas: 2
       mode: replicated
+      restart_policy:
+        condition: on-failure
     depends_on:
       - backend
     networks:
       - frontend-network
       - backend-network
+
   backend:
     ports:
       - "8001-8003:8000"
@@ -124,6 +130,8 @@ services:
     deploy:
       replicas: 3
       mode: replicated
+      restart_policy:
+        condition: on-failure
     depends_on:
       - mongo
   mongo:
@@ -142,7 +150,6 @@ configs:
 
 networks:
   frontend-network: 
-    ipam:
         driver: default
         config:
           - subnet: 172.28.0.0/16

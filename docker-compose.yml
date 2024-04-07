@@ -74,12 +74,12 @@ services:
     restart: always
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        VUE_APP_BACKEND_API: http://192.168.0.14:8000  
-    image: frontend:latest
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
+    #   args:
+    #     VUE_APP_BACKEND_API: http://192.168.219.166:8000  
+    image: shinkiho/agora-front-apiamden:1.0            
     ports:
       - "10001-10003:8080"
     networks:
