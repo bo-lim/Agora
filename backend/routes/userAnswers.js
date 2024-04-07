@@ -7,7 +7,7 @@ const db = mongoose.connection;
 const userAnswersSchema = mongoose.Schema({
     user_id: { type: String, ref:"Users", required: [true, 'User_id is required'] },
     question_id: { type: String, ref:"Questions", required: [true, 'Question_id Body is required'] },
-    selected_answer: { type: String, required: [true, 'Selected_answer is required'] }
+    selected_answer: { type: [String], required: [true, 'Selected_answer is required'] }
 });
 const userAnswersModel = mongoose.model('userAnswers', userAnswersSchema);
 
