@@ -62,12 +62,16 @@ export default {
             const userId = localStorage.getItem('user_id'); // 로컬 스토리지에서 사용자 ID 가져오기
             const questionId = this.question._id; // 문제 ID 가져오기
 
+            // 다중 답변을 선택한 경우 selectedAnswers 배열을 사용하고,
+            // 단일 답변을 선택한 경우 selectedAnswer 값을 배열에 담습니다.
+            let answers = this.isMultipleChoice ? this.selectedAnswers : [this.selectedAnswer];
+
             try {
-                // 답변 제출
+                // 답변을 대문자로 변환 후 제출
                 await axios.post(`${process.env.VUE_APP_BACKEND_API}/answer`, {
                     user_id: userId,
                     question_id: questionId,
-                    selected_answer: this.selectedAnswer
+                    selected_answer: answers.map(answer => answer.toUpperCase())
                 });
 
                 // 댓글이 입력된 경우, 댓글 제출
@@ -78,19 +82,16 @@ export default {
                 alert('답변이 제출되었습니다.');
                 this.$router.push({ name: 'discussquestion', params: { questionId: questionId } });
             } catch (error) {
-                if (error.response) {
-                    if (error.response.status === 409) {
-                        alert('이미 이 문제에 답변을 제출했습니다.');
-                    } else if (error.response.status === 400) {
-                        alert('입력값 오류입니다. 다시 시도해주세요.');
-                    } else {
-                        alert('오류가 발생했습니다. 다시 시도해주세요.');
-                    }
+                console.error('Error submitting answer:', error);
+                // 오류 처리 로직
+                if (error.response && error.response.status === 409) {
+                    alert('이미 이 문제에 답변을 제출했습니다.');
                 } else {
-                    console.error('Error submitting answer:', error);
+                    alert('답변 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
                 }
             }
-        },
+        }
+        ,
         async submitComment(userId, questionId) {
             // 이 함수에서 userId와 questionId 매개변수를 사용하여 API 호출
             try {
