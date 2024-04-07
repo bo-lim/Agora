@@ -12,7 +12,7 @@
         <!-- 통계 섹션 -->
         <div class="statistics-section">
             <div v-for="(option, index) in question.options" :key="index" class="statistic">
-                {{ getAnswerLetter(index) }}. : {{ percentages[option] }}%
+                {{ getAnswerLetter(index) }} : {{ percentages[option] }}%
             </div>
         </div>
         <!-- 정답 표시 섹션 -->
