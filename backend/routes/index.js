@@ -122,31 +122,35 @@ router.get("/discussion", (req, res) => {
 router.post("/answer", (req, res) => {
   console.log(`create answer`);
   try {
-    UserAnswer.userAnswersModel.find(
-      { user_id: req.body.user_id, question_id: req.body.question_id },
-      (err, messages) => {
-        if (messages.length > 0)
-          return res.status(409).json({ message: "이미 푼 문제입니다." });
-        else {
-          UserAnswer.create({
-            user_id: req.body.user_id,
-            question_id: req.body.question_id,
-            selected_answer: req.body.selected_answer.toUpperCase(),
-          });
-          res.status(200).send();
-        }
-      }
-    );
+      UserAnswer.userAnswersModel.find(
+          { user_id: req.body.user_id, question_id: req.body.question_id },
+          (err, messages) => {
+              if (messages.length > 0) {
+                  return res.status(409).json({ message: "이미 푼 문제입니다." });
+              } else {
+                  let selectedAnswers;
+                  // selected_answer가 배열인지 확인하고, 대문자로 변환 처리
+                  if (Array.isArray(req.body.selected_answer)) {
+                      selectedAnswers = req.body.selected_answer.map(answer => answer.toUpperCase());
+                  } else {
+                      selectedAnswers = [req.body.selected_answer.toUpperCase()];
+                  }
+
+                  UserAnswer.create({
+                      user_id: req.body.user_id,
+                      question_id: req.body.question_id,
+                      selected_answer: selectedAnswers,
+                  });
+                  res.status(200).send();
+              }
+          }
+      );
   } catch (err) {
-    if (err.name == "ValidationError") {
-      console.error("validation error: " + err);
-      res.status(400).json(err);
-    } else {
       console.error("could not save: " + err);
       res.status(500).json(err);
-    }
   }
 });
+
 
 router.get("/answer", (req, res) => {
   console.log(`get answer`);
@@ -197,39 +201,37 @@ router.get("/answers", (req, res) => {
   }
 });
 
-router.get("/ratio", (req, res) => {
-  console.log(`get ratio`);
+router.get("/ratio", async (req, res) => {
   try {
-    UserAnswer.userAnswersModel.find(
-      { question_id: req.query.question_id },
-      (err, messages) => {
-        let ratio = {};
-        let total = 0;
-        let result = {};
-        console.log(messages);
-        if (messages.length > 0) {
-          messages.forEach((message) => {
-            let s_answers = message.selected_answer.split("");
-            console.log(s_answers);
-            s_answers.forEach((s_answer) => {
-              console.log(s_answer);
-              total++;
-              if (s_answer in ratio) ratio[s_answer] += 1;
-              else ratio[s_answer] = 1;
-            });
-          });
+    const messages = await UserAnswer.userAnswersModel.find({ question_id: req.query.question_id }).exec();
+    let counts = {}; // 각 선택지에 대한 카운트
+    let total = 0; // 전체 답변 수
+
+    messages.forEach((message) => {
+      // 다중 선택지 처리
+      message.selected_answer.forEach((answer) => {
+        // answer는 선택된 답변의 텍스트
+        if (!counts[answer]) {
+          counts[answer] = 0;
         }
-        console.log(ratio);
-        for (r in ratio) {
-          result[r] = ((ratio[r] / total) * 100).toFixed(2);
-        }
-        res.status(200).json(result);
-      }
-    );
+        counts[answer]++;
+        total++;
+      });
+    });
+
+    let result = {};
+    Object.keys(counts).forEach((key) => {
+      result[key] = ((counts[key] / total) * 100).toFixed(2);
+    });
+
+    res.status(200).json(result);
   } catch (err) {
-    res.status(500).json(err);
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 
 // question
 router.post("/question", async (req, res) => {
