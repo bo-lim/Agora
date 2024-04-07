@@ -12,10 +12,9 @@
         <!-- 통계 섹션 -->
         <div class="statistics-section">
             <div v-for="(option, index) in question.options" :key="index" class="statistic">
-                {{ getAnswerLetter(index) }}: {{ percentages[getAnswerLetter(index)] || '0.00%' }}
+                {{ getAnswerLetter(index) }}. : {{ percentages[option] }}%
             </div>
         </div>
-
         <!-- 정답 표시 섹션 -->
         <div class="correct-answer-section">
             <div class="correct-answer">정답: {{ question.correct_answer }}</div>
@@ -157,27 +156,24 @@ export default {
                 });
 
                 if (response.status === 200 && response.data) {
-                    const data = response.data;
-                    let updatedPercentages = {};
+                    // 백엔드로부터 받은 비율 데이터를 올바르게 처리하여 percentages에 저장
+                    let updatedPercentages = this.question.options.reduce((acc, option) => {
+                        acc[option] = response.data[option] || '0.00'; // 텍스트를 기준으로 비율 할당
+                        return acc;
+                    }, {});
 
-                    // API 응답의 키들을 순회합니다.
-                    Object.keys(data).forEach((key, index) => {
-                        // 해당 인덱스에 해당하는 알파벳 문자열을 가져옵니다.
-                        const letter = this.getAnswerLetter(index);
-                        // 가져온 키에 해당하는 비율을 새로운 객체에 설정합니다.
-                        updatedPercentages[letter] = `${data[key]}%`;
-                    });
-
+                    // percentages 객체 업데이트
                     this.percentages = updatedPercentages;
                 } else {
                     throw new Error('Failed to fetch percentages');
                 }
             } catch (error) {
                 console.error('Error fetching percentages:', error);
+                // 에러 발생 시 percentages 데이터 초기화
                 this.percentages = {};
             }
-        }
-        ,
+        },
+
         getAnswerLetter(index) {
             // 옵션 인덱스를 알파벳으로 변환하여 반환
             return String.fromCharCode(65 + index);
