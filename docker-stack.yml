@@ -87,7 +87,7 @@ services:
       - frontend-network
   frontend:
     image:
-      dbgurum/guestbook:frontend_1.0
+      frontend:latest
     ports:
       - "10001-10003:8000"
     networks:
