@@ -85,16 +85,14 @@ services:
       - frontend
     networks:
       - frontend-network
+
   frontend:
     image:
-      frontend:latest
+      shinkiho/agora-vue-front:1.0
     ports:
       - "10001-10003:8000"
     networks:
       - frontend-network
-    environment:
-      PORT: 8000
-      GUESTBOOK_API_ADDR: haproxy:8000
     deploy:
       replicas: 3
       mode: replicated
@@ -122,7 +120,7 @@ services:
     networks:
       - backend-network
     image:
-      leebolim0701471/agora-backend:2.0
+      leebolim0701471/agora-backend:3.0
     deploy:
       replicas: 3
       mode: replicated
