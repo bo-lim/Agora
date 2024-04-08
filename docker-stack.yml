@@ -78,7 +78,7 @@ services:
 
   nginx:
     image:
-      leebolim0701471/frontend-lb:1.0
+      leebolim0701471/frontend-lb:3.0
     ports:
       - "88:80"
     depends_on:
@@ -88,9 +88,9 @@ services:
 
   frontend:
     image:
-      shinkiho/agora-vue-front:real
+      frontend:latest1
     ports:
-      - "10001-10003:8000"
+      - "10001-10003:8080"
     networks:
       - frontend-network
     deploy:
@@ -98,14 +98,11 @@ services:
       mode: replicated
   haproxy:
     image:
-      leebolim0701471/haproxy:7.0
+      leebolim0701471/haproxy:7.1
     privileged: true
     ports:
-      - "7999-8000:80"
-      - "9000-9001:9000"
-    deploy:
-      replicas: 2
-      mode: replicated
+      - "8000:8000"
+      - "9000:9000"
     depends_on:
       - backend
     networks:
@@ -116,7 +113,7 @@ services:
       - "8001-8003:8000"
     environment:
       PORT: 8000
-      GUESTBOOK_DB_ADDR: mongo:27017
+      GUESTBOOK_DB_ADDR: 192.168.56.101:17017
     networks:
       - backend-network
     image:
