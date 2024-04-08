@@ -34,8 +34,8 @@ services:
     ports:
       - 9559:8080
     privileged: true
-    deploy:
-      mode: global
+    # deploy:
+    #   mode: global
     volumes:
       - type: bind
         source: /
@@ -88,7 +88,7 @@ services:
 
   frontend:
     image:
-      shinkiho/agora-vue-front:1.0
+      shinkiho/agora-vue-front:real
     ports:
       - "10001-10003:8000"
     networks:
@@ -98,7 +98,7 @@ services:
       mode: replicated
   haproxy:
     image:
-      leebolim0701471/haproxy:6.0
+      leebolim0701471/haproxy:7.0
     privileged: true
     ports:
       - "7999-8000:80"
@@ -120,7 +120,7 @@ services:
     networks:
       - backend-network
     image:
-      leebolim0701471/agora-backend:3.0
+      leebolim0701471/agora-backend:4.0
     deploy:
       replicas: 3
       mode: replicated
